@@ -1,858 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Deli's World – Your Ultimate Makeup Destination</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deli's World – Your Ultimate Makeup Destination</title>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Google Fonts - Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDKs (using v10.12.0) -->
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-  <!-- Stripe SDK -->
-  <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-    }
-    .gradient-bg {
-      background: linear-gradient(to right, #fecaca, #fbcfe8);
-    }
-    .premium-card {
-      background-color: #fff;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease-in-out;
-    }
-    .premium-card:hover {
-      transform: translateY(-5px);
-    }
-    .btn-primary {
-      background-color: #ec4899;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 9999px;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .btn-primary:hover {
-      background-color: #db2777;
-    }
-    .page-section {
-      display: none; /* Hidden by default */
-    }
-    .page-section.active {
-      display: block; /* Show active section */
-    }
-    /* Custom modal styling for messages */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background-color: #fff;
-      padding: 2rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      max-width: 90%;
-      width: 400px;
-    }
-    .modal-close-btn {
-      margin-top: 1rem;
-      background-color: #ec4899;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-    }
-  </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    .gradient-bg {
+      background: linear-gradient(to right, #fecaca, #fbcfe8);
+    }
+    .premium-card {
+      background-color: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+    }
+    .premium-card:hover {
+      transform: translateY(-5px);
+    }
+    .btn-primary {
+      background-color: #ec4899;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .btn-primary:hover {
+      background-color: #db2777;
+    }
+    .page-section {
+      display: none; /* Hidden by default */
+    }
+    .page-section.active {
+      display: block; /* Show active section */
+    }
+    /* Custom modal styling for messages */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 90%;
+      width: 400px;
+    }
+    .modal-close-btn {
+      margin-top: 1rem;
+      background-color: #ec4899;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-  <header class="gradient-bg py-8 shadow-md">
-    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-      <!-- Blog Title -->
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 md:mb-0">Deli's World</h1>
-      <!-- Navigation -->
-      <nav>
-        <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6 text-gray-800 text-lg">
-          <li><a href="#" class="hover:underline nav-link" data-section="home-section">Home</a></li>
-          <li><a href="#" class="hover:underline nav-link" data-section="blog-posts-list-section"> Free Blog Posts</a></li>
-          <li><a href="#" class="hover:underline nav-link" data-section="about-deli-section">About Deli</a></li>
-          <li><a href="#" class="hover:underline nav-link" data-section="contact-section">Contact</a></li>
-         <li><a href="blogpage1.html" class="hover:underline">Beauty Daily</a></li>
-            <li><a href="Deli-more-articles.html" class="hover:underline">More Beauty Articles</a></li>
-          <li id="auth-buttons-container" class="flex space-x-4">
-            <button class="btn-primary" id="signup-modal-btn">Sign Up</button>
-            <button class="btn-primary" id="login-modal-btn">Log In</button>
-          </li>
-          <li id="logged-in-status" class="hidden flex items-center space-x-4">
-            <span id="user-status" class="text-gray-700 text-sm"></span>
-            <button id="logout-button" class="btn-primary">Log Out</button>
-          </li>
-          <!-- Display userId (mandatory for multi-user apps) -->
-          <li id="current-user-id" class="text-sm text-gray-500 hidden">
-            <span>User ID: </span><span id="display-user-id"></span>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <header class="gradient-bg py-8 shadow-md">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 md:mb-0">Deli's World</h1>
+            <nav>
+        <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6 text-gray-800 text-lg">
+          <li><a href="#" class="hover:underline nav-link" data-section="home-section">Home</a></li>
+          <li><a href="#" class="hover:underline nav-link" data-section="blog-posts-list-section"> Free Blog Posts</a></li>
+          <li><a href="#" class="hover:underline nav-link" data-section="about-deli-section">About Deli</a></li>
+          <li><a href="#" class="hover:underline nav-link" data-section="contact-section">Contact</a></li>
+         <li><a href="blogpage1.html" class="hover:underline">Beauty Daily</a></li>
+          <li><a href="Deli-more-articles.html" class="hover:underline">More Beauty Articles</a></li>
+          <li><a href="#" class="hover:underline nav-link" data-section="kids-plan-section">Kids Plan</a></li>
+          <li id="auth-buttons-container" class="flex space-x-4">
+            <button class="btn-primary" id="signup-modal-btn">Sign Up</button>
+            <button class="btn-primary" id="login-modal-btn">Log In</button>
+          </li>
+          <li id="logged-in-status" class="hidden flex items-center space-x-4">
+            <span id="user-status" class="text-gray-700 text-sm"></span>
+            <button id="logout-button" class="btn-primary">Log Out</button>
+          </li>
+                    <li id="current-user-id" class="text-sm text-gray-500 hidden">
+            <span>User ID: </span><span id="display-user-id"></span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <main class="container mx-auto px-4 py-12">
+  <main class="container mx-auto px-4 py-12">
 
-    <!-- Home Section -->
-    <section id="home-section" class="page-section active text-center mb-16">
-      <h2 class="text-4xl font-semibold text-gray-800 mb-4">Welcome to Deli's World of Beauty!</h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        Dive into a realm where beauty knows no bounds. Discover makeup tips, product reviews, and exclusive tutorials.
-      </p>
-      <div class="mt-12">
-        <h3 class="text-3xl font-semibold text-gray-800 mb-8 text-center">Featured Post</h3>
-        <!-- Featured Blog Post - Linking to the Foundation Article -->
-        <article class="bg-white rounded-xl shadow-lg overflow-hidden group max-w-xl mx-auto">
-          <img src="https://placehold.co/600x300/fecaca/881337?text=Featured+Article" alt="Deli's Product Review - Face Powder Shades" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/600x300/fecaca/881337?text=Image+Not+Found';">
-          <div class="p-6">
-            <h4 class="text-xl font-semibold text-gray-800 mb-2">My Top 5 Must-Have Foundations of 2025 (Premium!)</h4>
-            <p class="text-gray-600 text-sm mb-4">
-              Unlock my exclusive list of the best foundations for a flawless finish.
-            </p>
-            <a href="#" class="text-pink-500 hover:underline section-link" data-section="foundation-article-section">Read Premium Article &rarr;</a>
-          </div>
-        </article>
-      </div>
-      <!-- Call to Action Section - for premium sign-up -->
-      <section class="text-center py-12">
-        <h3 class="text-3xl font-semibold text-gray-800 mb-4">Ready to Transform Your Look?</h3>
-        <p class="text-lg text-gray-600 mb-8">Join Deli's World today and embark on your beauty journey!</p>
-        <button class="btn-primary" id="explore-plans-btn">Explore All Plans</button>
-      </section>
-    </section>
+        <section id="home-section" class="page-section active text-center mb-16">
+      <h2 class="text-4xl font-semibold text-gray-800 mb-4">Welcome to Deli's World of Beauty!</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Dive into a realm where beauty knows no bounds. Discover makeup tips, product reviews, and exclusive tutorials.
+      </p>
+      <div class="mt-12">
+        <h3 class="text-3xl font-semibold text-gray-800 mb-8 text-center">Featured Post</h3>
+                <article class="bg-white rounded-xl shadow-lg overflow-hidden group max-w-xl mx-auto">
+          <img src="https://placehold.co/600x300/fecaca/881337?text=Featured+Article" alt="Deli's Product Review - Face Powder Shades" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/600x300/fecaca/881337?text=Image+Not+Found';">
+          <div class="p-6">
+            <h4 class="text-xl font-semibold text-gray-800 mb-2">My Top 5 Must-Have Foundations of 2025 (Premium!)</h4>
+            <p class="text-gray-600 text-sm mb-4">
+              Unlock my exclusive list of the best foundations for a flawless finish.
+            </p>
+            <a href="#" class="text-pink-500 hover:underline section-link" data-section="foundation-article-section">Read Premium Article &rarr;</a>
+          </div>
+        </article>
+      </div>
+            <section class="text-center py-12">
+        <h3 class="text-3xl font-semibold text-gray-800 mb-4">Ready to Transform Your Look?</h3>
+        <p class="text-lg text-gray-600 mb-8">Join Deli's World today and embark on your beauty journey!</p>
+        <button class="btn-primary" id="explore-plans-btn">Explore All Plans</button>
+      </section>
+    </section>
 
-    <!-- Blog Posts List Section -->
-    <section id="blog-posts-list-section" class="page-section text-center mb-16">
-        <h2 class="text-4xl font-semibold text-gray-800 mb-8">All Blog Posts</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Example Blog Post Card 1 -->
-            <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
-                <img src="https://placehold.co/400x250/fbcfe8/be185d?text=Makeup+Tips" alt="Makeup Tips" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
-                <div class="p-6">
-                    <h4 class="text-xl font-semibold text-gray-800 mb-2">5 Essential Makeup Tips for Beginners</h4>
-                    <p class="text-gray-600 text-sm mb-4">Learn the basics to start your makeup journey with confidence.</p>
-                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
-                </div>
-            </article>
-            <!-- Example Blog Post Card 2 -->
-            <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
-                <img src="https://placehold.co/400x250/fecaca/9f1239?text=Product+Review" alt="Product Review" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
-                <div class="p-6">
-                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Review: The Latest Anti-Aging Serum</h4>
-                    <p class="text-gray-600 text-sm mb-4">An in-depth look at whether this serum lives up to its claims.</p>
-                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
-                </div>
-            </article>
-            <!-- Example Blog Post Card 3 -->
-            <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
-                <img src="https://placehold.co/400x250/bae6fd/0369a1?text=Beauty+Trends" alt="Beauty Trends" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
-                <div class="p-6">
-                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Top Beauty Trends to Try in 2025</h4>
-                    <p class="text-gray-600 text-sm mb-4">Stay ahead with the hottest looks and styles.</p>
-                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
-                </div>
-            </article>
-        </div>
-    </section>
+        <section id="blog-posts-list-section" class="page-section text-center mb-16">
+        <h2 class="text-4xl font-semibold text-gray-800 mb-8">All Blog Posts</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
+                <img src="https://placehold.co/400x250/fbcfe8/be185d?text=Makeup+Tips" alt="Makeup Tips" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">5 Essential Makeup Tips for Beginners</h4>
+                    <p class="text-gray-600 text-sm mb-4">Learn the basics to start your makeup journey with confidence.</p>
+                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
+                </div>
+            </article>
+                        <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
+                <img src="https://placehold.co/400x250/fecaca/9f1239?text=Product+Review" alt="Product Review" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Review: The Latest Anti-Aging Serum</h4>
+                    <p class="text-gray-600 text-sm mb-4">An in-depth look at whether this serum lives up to its claims.</p>
+                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
+                </div>
+            </article>
+                        <article class="bg-white rounded-xl shadow-lg overflow-hidden group">
+                <img src="https://placehold.co/400x250/bae6fd/0369a1?text=Beauty+Trends" alt="Beauty Trends" class="w-full h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Top Beauty Trends to Try in 2025</h4>
+                    <p class="text-gray-600 text-sm mb-4">Stay ahead with the hottest looks and styles.</p>
+                    <a href="#" class="text-pink-500 hover:underline">Read More &rarr;</a>
+                </div>
+            </article>
+        </div>
+    </section>
 
-    <!-- About Deli Section -->
-    <section id="about-deli-section" class="page-section text-center mb-16">
-        <h2 class="text-4xl font-semibold text-gray-800 mb-8">About Deli</h2>
-        <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
-            <img src="https://placehold.co/150x150/dbeafe/1e40af?text=Deli" alt="Deli's Profile" class="rounded-full mx-auto mb-6 w-36 h-36 object-cover">
-            <p class="text-lg text-gray-600 mb-4">
-                Hi, I'm Deli! Welcome to my world where I share my passion for makeup, beauty, and all things glamour.
-                With years of experience in the beauty industry, I love exploring new products, techniques, and trends
-                to help you look and feel your best.
-            </p>
-            <p class="text-lg text-gray-600">
-                Join me on this beautiful journey as we discover the secrets to enhancing your natural beauty.
-            </p>
-        </div>
-    </section>
+        <section id="about-deli-section" class="page-section text-center mb-16">
+        <h2 class="text-4xl font-semibold text-gray-800 mb-8">About Deli</h2>
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
+            <img src="https://placehold.co/150x150/dbeafe/1e40af?text=Deli" alt="Deli's Profile" class="rounded-full mx-auto mb-6 w-36 h-36 object-cover">
+            <p class="text-lg text-gray-600 mb-4">
+                Hi, I'm Deli! Welcome to my world where I share my passion for makeup, beauty, and all things glamour.
+                With years of experience in the beauty industry, I love exploring new products, techniques, and trends
+                to help you look and feel your best.
+            </p>
+            <p class="text-lg text-gray-600">
+                Join me on this beautiful journey as we discover the secrets to enhancing your natural beauty.
+            </p>
+        </div>
+    </section>
 
-    <!-- Contact Section -->
-    <section id="contact-section" class="page-section text-center mb-16">
-        <h2 class="text-4xl font-semibold text-gray-800 mb-8">Contact Me</h2>
-        <div class="bg-white rounded-xl shadow-lg p-8 max-w-xl mx-auto">
-            <p class="text-lg text-gray-600 mb-6">
-                Have questions, suggestions, or just want to say hello? Feel free to reach out!
-            </p>
-            <form class="space-y-4">
-                <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400">
-                <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400">
-                <textarea placeholder="Your Message" rows="5" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"></textarea>
-                <button type="submit" class="btn-primary w-full">Send Message</button>
-            </form>
-        </div>
-    </section>
+        <section id="contact-section" class="page-section text-center mb-16">
+        <h2 class="text-4xl font-semibold text-gray-800 mb-8">Contact Me</h2>
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-xl mx-auto">
+            <p class="text-lg text-gray-600 mb-6">
+                Have questions, suggestions, or just want to say hello? Feel free to reach out!
+            </p>
+            <form class="space-y-4">
+                <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400">
+                <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400">
+                <textarea placeholder="Your Message" rows="5" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"></textarea>
+                <button type="submit" class="btn-primary w-full">Send Message</button>
+            </form>
+        </div>
+    </section>
 
-    <!-- Foundation Article Section (Premium Content) -->
-    <section id="foundation-article-section" class="page-section text-center mb-16">
-        <h2 class="text-4xl font-semibold text-gray-800 mb-8">My Top 5 Must-Have Foundations of 2025</h2>
-        <div class="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto text-left">
-            <img src="https://placehold.co/800x400/fecaca/881337?text=Foundation+Article" alt="Foundation Guide" class="w-full rounded-lg mb-6">
-            <p class="text-lg text-gray-700 mb-4">
-                Welcome, premium subscribers! Today, we're diving deep into the world of foundations.
-                Finding the perfect foundation is crucial for a flawless makeup look, and after extensive testing,
-                I've narrowed down my top five picks for 2025.
-            </p>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">1. The Luminous Longwear Foundation</h3>
-            <p class="text-gray-600 mb-4">
-                This foundation offers an unparalleled blend of glow and staying power. Perfect for all-day wear
-                without feeling heavy.
-            </p>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">2. Hydrating Silk Finish</h3>
-            <p class="text-gray-600 mb-4">
-                Ideal for dry skin types, this foundation provides intense hydration while giving a smooth,
-                silk-like finish.
-            </p>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">3. Matte Perfection Foundation</h3>
-            <p class="text-gray-600 mb-4">
-                For those with oily skin or who prefer a completely matte look, this formula controls shine
-                and blurs imperfections.
-            </p>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">4. Buildable Coverage Cream</h3>
-            <p class="text-gray-600 mb-4">
-                From sheer to full coverage, this versatile cream foundation allows you to customize your look effortlessly.
-            </p>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">5. Skin-Loving Mineral Foundation</h3>
-            <p class="text-gray-600 mb-4">
-                Infused with skin-benefiting minerals, this foundation provides coverage while improving skin health over time.
-            </p>
-            <p class="text-lg text-gray-700 mt-6">
-                I hope this guide helps you find your next holy grail foundation! Let me know your favorites in the comments below.
-            </p>
-        </div>
-    </section>
+        <section id="foundation-article-section" class="page-section text-center mb-16">
+        <h2 class="text-4xl font-semibold text-gray-800 mb-8">My Top 5 Must-Have Foundations of 2025</h2>
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto text-left">
+            <img src="https://placehold.co/800x400/fecaca/881337?text=Foundation+Article" alt="Foundation Guide" class="w-full rounded-lg mb-6">
+            <p class="text-lg text-gray-700 mb-4">
+                Welcome, premium subscribers! Today, we're diving deep into the world of foundations.
+                Finding the perfect foundation is crucial for a flawless makeup look, and after extensive testing,
+                I've narrowed down my top five picks for 2025.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">1. The Luminous Longwear Foundation</h3>
+            <p class="text-gray-600 mb-4">
+                This foundation offers an unparalleled blend of glow and staying power. Perfect for all-day wear
+                without feeling heavy.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">2. Hydrating Silk Finish</h3>
+            <p class="text-gray-600 mb-4">
+                Ideal for dry skin types, this foundation provides intense hydration while giving a smooth,
+                silk-like finish.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">3. Matte Perfection Foundation</h3>
+            <p class="text-gray-600 mb-4">
+                For those with oily skin or who prefer a completely matte look, this formula controls shine
+                and blurs imperfections.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">4. Buildable Coverage Cream</h3>
+            <p class="text-gray-600 mb-4">
+                From sheer to full coverage, this versatile cream foundation allows you to customize your look effortlessly.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">5. Skin-Loving Mineral Foundation</h3>
+            <p class="text-gray-600 mb-4">
+                Infused with skin-benefiting minerals, this foundation provides coverage while improving skin health over time.
+            </p>
+            <p class="text-lg text-gray-700 mt-6">
+                I hope this guide helps you find your next holy grail foundation! Let me know your favorites in the comments below.
+            </p>
+        </div>
+    </section>
 
-    <!-- Premium Plans Section -->
-    <section id="premium-plans-section" class="page-section text-center py-12">
-      <h2 class="text-4xl font-semibold text-gray-800 mb-8">Choose Your Premium Plan</h2>
-      <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Unlock exclusive content, advanced tutorials, and more by joining our premium community.</p>
+        <section id="premium-plans-section" class="page-section text-center py-12">
+      <h2 class="text-4xl font-semibold text-gray-800 mb-8">Choose Your Premium Plan</h2>
+      <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Unlock exclusive content, advanced tutorials, and more by joining our premium community.</p>
 
-      <div class="flex flex-col md:flex-row justify-center items-center md:space-x-8 space-y-8 md:space-y-0">
-        <!-- Basic Plan Card -->
-        <div class="premium-card p-8 w-full md:w-1/3 max-w-sm">
-          <h4 class="text-3xl font-bold text-gray-800 mb-4">Basic</h4>
-          <p class="text-5xl font-extrabold text-pink-500 mb-6">$9.99<span class="text-xl text-gray-500">/month</span></p>
-          <ul class="text-gray-600 text-left mb-8 space-y-2">
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Access to all premium articles</li>
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Monthly exclusive content</li>
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email newsletter</li>
-          </ul>
-          <button id="basicSubscribeBtn" class="btn-primary w-full">Subscribe to Basic</button>
-        </div>
+      <div class="flex flex-col md:flex-row justify-center items-center md:space-x-8 space-y-8 md:space-y-0">
+                <div class="premium-card p-8 w-full md:w-1/3 max-w-sm">
+          <h4 class="text-3xl font-bold text-gray-800 mb-4">Basic</h4>
+          <p class="text-5xl font-extrabold text-pink-500 mb-6">$9.99<span class="text-xl text-gray-500">/month</span></p>
+          <ul class="text-gray-600 text-left mb-8 space-y-2">
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Access to all premium articles</li>
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Monthly exclusive content</li>
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email newsletter</li>
+          </ul>
+          <button id="basicSubscribeBtn" class="btn-primary w-full">Subscribe to Basic</button>
+        </div>
 
-        <!-- VIP Plan Card -->
-        <div class="premium-card p-8 w-full md:w-1/3 max-w-sm border-2 border-pink-500">
-          <h4 class="text-3xl font-bold text-gray-800 mb-4">VIP</h4>
-          <p class="text-5xl font-extrabold text-pink-500 mb-6">$19.99<span class="text-xl text-gray-500">/month</span></p>
-          <ul class="text-gray-600 text-left mb-8 space-y-2">
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>All Basic features</li>
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Personalized beauty consultation</li>
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Early access to new products</li>
-            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Exclusive VIP workshops</li>
-          </ul>
-          <button id="vipSubscribeBtn" class="btn-primary w-full">Join VIP</button>
-        </div>
-      </div>
-    </section>
+                <div class="premium-card p-8 w-full md:w-1/3 max-w-sm border-2 border-pink-500">
+          <h4 class="text-3xl font-bold text-gray-800 mb-4">VIP</h4>
+          <p class="text-5xl font-extrabold text-pink-500 mb-6">$19.99<span class="text-xl text-gray-500">/month</span></p>
+          <ul class="text-gray-600 text-left mb-8 space-y-2">
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>All Basic features</li>
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Personalized beauty consultation</li>
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Early access to new products</li>
+            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Exclusive VIP workshops</li>
+          </ul>
+          <button id="vipSubscribeBtn" class="btn-primary w-full">Join VIP</button>
+        </div>
+      </div>
+    </section>
 
-  </main>
-
-  
-
-       
-
-
-      <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscribe to Kids Plan</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs (using v10.12.0) -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-    <!-- Stripe.js for potential future use (though direct redirect is handled by function) -->
-    <script src="https://js.stripe.com/v3/"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            line-height: 1.6;
-            color: #334155;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-        .container-wrapper {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: #ec4899;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .btn-primary:hover { background-color: #db2777; }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .modal-close-btn {
-            @apply mt-4 px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-200;
-        }
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ec4899;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container-wrapper">
-        <h1 class="text-4xl font-bold text-gray-800 mb-6">Subscribe to Kids Plan</h1>
-        <p class="text-lg text-gray-700 mb-8">
-            Unlock exclusive activities and content for tweens and teens with our Premium Kids Plan!
+    <section id="kids-plan-section" class="page-section text-center py-12 mb-16">
+        <h2 class="text-4xl font-semibold text-gray-800 mb-8">Deli's Kids Plan</h2>
+        <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+            Unlock exclusive, age-appropriate content, fun beauty tips, and creative activities for the younger generation!
+            Perfect for tweens and teens exploring the world of makeup safely and creatively.
         </p>
-        <button id="subscribe-button" class="btn-primary">
-            Subscribe Now for $12.99/month
-            <span id="loading-spinner" class="loading-spinner hidden"></span>
-        </button>
-        <p class="text-sm text-gray-500 mt-4">
-            You must be logged in to subscribe.
-        </p>
-        <button id="login-button-page" class="text-pink-500 hover:underline mt-2">Already a member? Log In</button>
-    </div>
+        <div class="premium-card p-8 w-full md:w-1/2 max-w-md mx-auto border-2 border-purple-500">
+            <h4 class="text-3xl font-bold text-gray-800 mb-4">Kids Plan</h4>
+            <p class="text-5xl font-extrabold text-purple-500 mb-6">$12.99<span class="text-xl text-gray-500">/month</span></p>
+            <ul class="text-gray-600 text-left mb-8 space-y-2">
+                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Safe & fun makeup tutorials</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Creative beauty challenges</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Parent-approved product recommendations</li>
+            </ul>
+            <button id="kidsSubscribeBtn" class="btn-primary w-full">Subscribe to Kids Plan</button>
+        </div>
+    </section>
 
-   
+  </main>
+  
+      <div id="authModal" class="modal-overlay hidden">
+    <div class="modal-content w-full max-w-md">
+      <h3 class="text-2xl font-semibold mb-4 text-gray-800">Create Your Account</h3>
+      <input id="auth-email" type="email" placeholder="Email" class="mb-2 px-4 py-2 border rounded w-full" />
+      <input id="auth-password" type="password" placeholder="Password" class="mb-2 px-4 py-2 border rounded w-full" />
+      <input id="auth-confirm-password" type="password" placeholder="Confirm Password" class="mb-4 px-4 py-2 border rounded w-full" />
+      <button id="signup-button" class="btn-primary w-full">Sign Up</button>
+      <button class="modal-close-btn bg-gray-300 text-gray-800 hover:bg-gray-400" id="signup-cancel-btn">Cancel</button>
+    </div>
+  </div>
 
-    <script type="module">
-        // Firebase initialization
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import {
-            getAuth,
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signInAnonymously,
-            signInWithCustomToken
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <div id="loginModal" class="modal-overlay hidden">
+    <div class="modal-content w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-4 text-center">Log In</h2>
+      <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-4 p-2 border rounded" />
+      <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-2 border rounded" />
+      <button id="login-button" class="btn-primary w-full">Log In</button>
+      <button class="modal-close-btn bg-gray-300 text-gray-800 hover:bg-gray-400" id="login-cancel-btn">Cancel</button>
+    </div>
+  </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBDeFd1HMO3rQfJu5JzqKXkzq-Oz68dQDk",
-            authDomain: "deli-sworld-subscription.firebaseapp.com",
-            projectId: "deli-sworld-subscription",
-            storageBucket: "deli-sworld-subscription.firebasestorage.app",
-            messagingSenderId: "678490444860",
-            appId: "1:678490444860:web:3294be895f8033e7d01f39",
-            measurementId: "G-4T8CL2174E"
-        };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    <div id="messageModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <p id="messageText" class="text-lg text-gray-700 mb-4"></p>
+      <button class="modal-close-btn" id="message-ok-btn">OK</button>
+    </div>
+  </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const functions = getFunctions(app);
-
-        // Get a reference to the callable function
-        const createKidsPlanCheckoutSession = httpsCallable(functions, 'createKidsPlanCheckoutSession');
-
-        // --- UI Elements ---
-        let subscribeButton;
-        let loginButtonPage;
-        let loadingSpinner;
-        let loginModal;
-        let loginEmailInput;
-        let loginPasswordInput;
-        let loginModalButton;
-        let loginCancelButton;
-
-        // Function to initialize UI elements after DOM is loaded
-        function initializeUIElements() {
-            subscribeButton = document.getElementById('subscribe-button');
-            loginButtonPage = document.getElementById('login-button-page');
-            loadingSpinner = document.getElementById('loading-spinner');
-            loginModal = document.getElementById('loginModal');
-            loginEmailInput = document.getElementById('loginEmail');
-            loginPasswordInput = document.getElementById('loginPassword');
-            loginModalButton = document.getElementById('login-modal-button');
-            loginCancelButton = document.getElementById('login-cancel-btn');
-
-            // Attach event listeners after elements are guaranteed to exist
-            if (subscribeButton) subscribeButton.addEventListener('click', subscribeToKidsPlan);
-            if (loginButtonPage) loginButtonPage.addEventListener('click', () => { loginModal.style.display = 'flex'; });
-            if (loginModalButton) loginModalButton.addEventListener('click', handleLogin);
-            if (loginCancelButton) loginCancelButton.addEventListener('click', () => { loginModal.style.display = 'none'; });
-        }
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut,
+      signInAnonymously,
+      signInWithCustomToken
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 
-        async function handleLogin() {
-            const email = loginEmailInput.value;
-            const password = loginPasswordInput.value;
+    // Firebase configuration provided by the user
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDeFd1HMO3rQfJu5JzqKXkzq-Oz68dQDk",
+      authDomain: "deli-sworld-subscription.firebaseapp.com",
+      projectId: "deli-sworld-subscription",
+      storageBucket: "deli-sworld-subscription.firebasestorage.app",
+      messagingSenderId: "678490444860",
+      appId: "1:678490444860:web:3294be895f8033e7d01f39",
+      measurementId: "G-4T8CL2174E"
+    };
 
-            if (!email || !password) {
-                console.log("Please enter both email and password.");
-                return;
-            }
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                console.log("Logged in successfully!");
-                loginModal.style.display = "none";
-            } catch (error) {
-                console.error("Login failed: " + error.message);
-            }
-        }
-
-        async function subscribeToKidsPlan() {
-            const user = auth.currentUser;
-            if (!user) {
-                console.log("You must be logged in to subscribe. Please log in first.");
-                loginModal.style.display = 'flex';
-                return;
-            }
-
-            loadingSpinner.classList.remove('hidden');
-            subscribeButton.disabled = true;
-
-            try {
-                const result = await createKidsPlanCheckoutSession();
-                const { url } = result.data;
-
-                if (url) {
-                    window.location.href = url;
-                } else {
-                    console.error("Failed to get Stripe checkout URL.");
-                }
-            } catch (error) {
-                console.error("Error subscribing to Kids Plan:", error);
-            } finally {
-                loadingSpinner.classList.add('hidden');
-                subscribeButton.disabled = false;
-            }
-        }
-
-        // Handle initial auth state
-        onAuthStateChanged(auth, (user) => {
-            if (loginButtonPage) { // Ensure loginButtonPage exists before updating
-                if (user) {
-                    loginButtonPage.textContent = `Logged in as ${user.email || 'User'}`;
-                    loginButtonPage.disabled = true;
-                } else {
-                    loginButtonPage.textContent = "Already a member? Log In";
-                    loginButtonPage.disabled = false;
-                }
-            }
-        });
-
-        // Initialize UI elements and attach listeners once the DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', initializeUIElements);
-    </script>
-</body>
-   </section>
+    // appId is still derived from the Canvas environment variable
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
+    // Initialize Stripe with the provided public key
+    const stripe = Stripe("pk_live_51RXVHEDUGtG6RSaQSRA3mNRjmKDpm3uaS5yqLGQaioQAF4h46xtK8iZAicPPSazyONwHec6nYXpc7QsXRM4KEedu00taF9cnOX");
 
+    let userId = null; // To store the current user's ID
 
-  
-  
-  
-  
-  
-  
-  
-  <!-- 🔐 Auth Modals -->
-  <!-- Sign Up Modal -->
-  <div id="authModal" class="modal-overlay hidden">
-    <div class="modal-content w-full max-w-md">
-      <h3 class="text-2xl font-semibold mb-4 text-gray-800">Create Your Account</h3>
-      <input id="auth-email" type="email" placeholder="Email" class="mb-2 px-4 py-2 border rounded w-full" />
-      <input id="auth-password" type="password" placeholder="Password" class="mb-2 px-4 py-2 border rounded w-full" />
-      <input id="auth-confirm-password" type="password" placeholder="Confirm Password" class="mb-4 px-4 py-2 border rounded w-full" />
-      <button id="signup-button" class="btn-primary w-full">Sign Up</button>
-      <button class="modal-close-btn bg-gray-300 text-gray-800 hover:bg-gray-400" id="signup-cancel-btn">Cancel</button>
-    </div>
-  </div>
+    // Function to display custom messages (replaces alert())
+    function showMessage(message) {
+      document.getElementById("messageText").textContent = message;
+      document.getElementById("messageModal").style.display = "flex";
+    }
 
-  <!-- Log In Modal -->
-  <div id="loginModal" class="modal-overlay hidden">
-    <div class="modal-content w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-4 text-center">Log In</h2>
-      <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-4 p-2 border rounded" />
-      <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-2 border rounded" />
-      <button id="login-button" class="btn-primary w-full">Log In</button>
-      <button class="modal-close-btn bg-gray-300 text-gray-800 hover:bg-gray-400" id="login-cancel-btn">Cancel</button>
-    </div>
-  </div>
+    // Function to handle user sign-up
+    async function handleSignUp() {
+      const email = document.getElementById("auth-email").value;
+      const password = document.getElementById("auth-password").value;
+      const confirmPassword = document.getElementById("auth-confirm-password").value;
 
-  <!-- Custom Message Modal -->
-  <div id="messageModal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <p id="messageText" class="text-lg text-gray-700 mb-4"></p>
-      <button class="modal-close-btn" id="message-ok-btn">OK</button>
-    </div>
-  </div>
+      if (!email || !password || !confirmPassword) {
+        showMessage("Please fill in all fields.");
+        return;
+      }
 
-  <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut,
-      signInAnonymously,
-      signInWithCustomToken
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      if (password !== confirmPassword) {
+        showMessage("Passwords do not match!");
+        return;
+      }
 
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        showMessage("Welcome, " + userCredential.user.email + "!");
+        document.getElementById("authModal").style.display = "none"; // Hide modal on success
+      } catch (error) {
+        showMessage("Sign-up error: " + error.message);
+        console.error("Sign-up error:", error);
+      }
+    }
 
-    // Firebase configuration provided by the user
-    const firebaseConfig = {
-      apiKey: "AIzaSyBDeFd1HMO3rQfJu5JzqKXkzq-Oz68dQDk",
-      authDomain: "deli-sworld-subscription.firebaseapp.com",
-      projectId: "deli-sworld-subscription",
-      storageBucket: "deli-sworld-subscription.firebasestorage.app",
-      messagingSenderId: "678490444860",
-      appId: "1:678490444860:web:3294be895f8033e7d01f39",
-      measurementId: "G-4T8CL2174E"
-    };
+    // Function to handle user login
+    async function handleLogin() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
 
-    // appId is still derived from the Canvas environment variable
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        showMessage("Logged in successfully as " + userCredential.user.email + "!");
+        document.getElementById("loginModal").style.display = "none"; // Hide modal on success
+      } catch (error) {
+        showMessage("Login failed: " + error.message);
+        console.error("Login error:", error);
+      }
+    }
 
+    // Function to handle user logout
+    async function handleLogout() {
+      try {
+        await signOut(auth);
+        showMessage("Logged out successfully.");
+        showSection('home-section'); // Go back to home page after logout
+      } catch (error) {
+        showMessage("Logout error: " + error.message);
+        console.error("Logout error:", error);
+      }
+    }
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // Function to switch between sections
+    function showSection(sectionId) {
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      const activeSection = document.getElementById(sectionId);
+      if (activeSection) {
+        activeSection.classList.add('active');
+      } else {
+        console.error(`Section with ID '${sectionId}' not found.`);
+      }
+    }
 
-    // Initialize Stripe with the provided public key
-    const stripe = Stripe("pk_live_51RXVHEDUGtG6RSaQSRA3mNRjmKDpm3uaS5yqLGQaioQAF4h46xtK8iZAicPPSazyONwHec6nYXpc7QsXRM4KEedu00taF9cnOX");
+    // Function to redirect to Stripe Checkout
+    async function redirectToCheckout(plan) {
+      const user = auth.currentUser;
+      if (!user) {
+        showMessage("Please sign in to subscribe.");
+        document.getElementById("loginModal").style.display = "flex"; // Prompt login if not signed in
+        return;
+      }
 
-    let userId = null; // To store the current user's ID
-
-    // Function to display custom messages (replaces alert())
-    function showMessage(message) {
-      document.getElementById("messageText").textContent = message;
-      document.getElementById("messageModal").style.display = "flex";
-    }
-
-    // Function to handle user sign-up
-    async function handleSignUp() {
-      const email = document.getElementById("auth-email").value;
-      const password = document.getElementById("auth-password").value;
-      const confirmPassword = document.getElementById("auth-confirm-password").value;
-
-      if (!email || !password || !confirmPassword) {
-        showMessage("Please fill in all fields.");
+      let endpoint;
+      if (plan === "vip") {
+        endpoint = "https://backend-server-vipplan-js.onrender.com"; // New VIP endpoint
+      } else if (plan === "basic") { // "basic" plan
+        endpoint = "https://www-deliworldmakeupandbeautyblog-com.onrender.com"; // New Basic endpoint
+      } else if (plan === "kids") {
+        window.location.href = "https://buy.stripe.com/00w28r2hM2C249g9To3cc03"; // Direct Stripe link for Kids Plan
         return;
       }
 
-      if (password !== confirmPassword) {
-        showMessage("Passwords do not match!");
-        return;
-      }
+      try {
+        // Send a request to your backend to create a Stripe Checkout Session
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          // Pass user's UID and email to your backend
+          body: JSON.stringify({ uid: user.uid, email: user.email })
+        });
 
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        showMessage("Welcome, " + userCredential.user.email + "!");
-        document.getElementById("authModal").style.display = "none"; // Hide modal on success
-      } catch (error) {
-        showMessage("Sign-up error: " + error.message);
-        console.error("Sign-up error:", error);
-      }
-    }
+        // Check if the response is OK (status 200-299)
+        if (!res.ok) {
+          const errorText = await res.text(); // Get raw text to see if it's HTML
+          console.error("Backend response not OK:", res.status, errorText);
+          showMessage(`Checkout process error: Server responded with status ${res.status}. Response: ${errorText.substring(0, 100)}... (check console for full response)`);
+          return; // Exit if response is not OK
+        }
 
-    // Function to handle user login
-    async function handleLogin() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        showMessage("Logged in successfully as " + userCredential.user.email + "!");
-        document.getElementById("loginModal").style.display = "none"; // Hide modal on success
-      } catch (error) {
-        showMessage("Login failed: " + error.message);
-        console.error("Login error:", error);
-      }
-    }
-
-    // Function to handle user logout
-    async function handleLogout() {
-      try {
-        await signOut(auth);
-        showMessage("Logged out successfully.");
-        showSection('home-section'); // Go back to home page after logout
-      } catch (error) {
-        showMessage("Logout error: " + error.message);
-        console.error("Logout error:", error);
-      }
-    }
-
-    // Function to switch between sections
-    function showSection(sectionId) {
-      document.querySelectorAll('.page-section').forEach(section => {
-        section.classList.remove('active');
-      });
-      const activeSection = document.getElementById(sectionId);
-      if (activeSection) {
-        activeSection.classList.add('active');
-      } else {
-        console.error(`Section with ID '${sectionId}' not found.`);
-      }
-    }
-
-    // Function to redirect to Stripe Checkout
-    async function redirectToCheckout(plan) {
-      const user = auth.currentUser;
-      if (!user) {
-        showMessage("Please sign in to subscribe.");
-        document.getElementById("loginModal").style.display = "flex"; // Prompt login if not signed in
-        return;
-      }
-
-      let endpoint;
-      if (plan === "vip") {
-        endpoint = "https://backend-server-vipplan-js.onrender.com"; // New VIP endpoint
-      } else { // "basic" plan
-        endpoint = "https://www-deliworldmakeupandbeautyblog-com.onrender.com"; // New Basic endpoint
-      }
-
-      try {
-        // Send a request to your backend to create a Stripe Checkout Session
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          // Pass user's UID and email to your backend
-          body: JSON.stringify({ uid: user.uid, email: user.email })
-        });
-
-        // Check if the response is OK (status 200-299)
-        if (!res.ok) {
-          const errorText = await res.text(); // Get raw text to see if it's HTML
-          console.error("Backend response not OK:", res.status, errorText);
-          showMessage(`Checkout process error: Server responded with status ${res.status}. Response: ${errorText.substring(0, 100)}... (check console for full response)`);
-          return; // Exit if response is not OK
-        }
-
-        // Try to parse the response as JSON
-        let session;
-        try {
-          session = await res.json();
-        } catch (jsonError) {
-          const errorText = await res.text(); // Get raw text to see what was sent
-          console.error("Error parsing JSON response from backend:", jsonError, "Full response text:", errorText);
-          showMessage(`Checkout process error: Received invalid JSON from server. Response starts with: ${errorText.substring(0, 100)}...`);
-          return; // Exit if JSON parsing fails
-        }
+        // Try to parse the response as JSON
+        let session;
+        try {
+          session = await res.json();
+        } catch (jsonError) {
+          const errorText = await res.text(); // Get raw text to see what was sent
+          console.error("Error parsing JSON response from backend:", jsonError, "Full response text:", errorText);
+          showMessage(`Checkout process error: Received invalid JSON from server. Response starts with: ${errorText.substring(0, 100)}...`);
+          return; // Exit if JSON parsing fails
+        }
 
 
-        // Redirect to Stripe Checkout page
-        const result = await stripe.redirectToCheckout({ sessionId: session.id });
+        // Redirect to Stripe Checkout page
+        const result = await stripe.redirectToCheckout({ sessionId: session.id });
 
-        if (result.error) {
-          // If `redirectToCheckout` fails due to a browser or network error, display the error
-          showMessage("Stripe redirect error: " + result.error.message);
-          console.error("Stripe redirect error:", result.error);
-        }
-      } catch (err) {
-        // Catch any errors during the fetch or JSON parsing
-        showMessage("Checkout process error: " + err.message);
-        console.error("Checkout process error (network/other):", err);
-      }
-    }
+        if (result.error) {
+          // If `redirectToCheckout` fails due to a browser or network error, display the error
+          showMessage("Stripe redirect error: " + result.error.message);
+          console.error("Stripe redirect error:", result.error);
+        }
+      } catch (err) {
+        // Catch any errors during the fetch or JSON parsing
+        showMessage("Checkout process error: " + err.message);
+        console.error("Checkout process error (network/other):", err);
+      }
+    }
 
-    // Listen for Firebase authentication state changes
-    onAuthStateChanged(auth, async (user) => {
-      const authButtonsContainer = document.getElementById("auth-buttons-container");
-      const loggedInStatus = document.getElementById("logged-in-status");
-      const userStatusText = document.getElementById("user-status");
-      const displayUserId = document.getElementById("display-user-id");
-      const currentUserIdContainer = document.getElementById("current-user-id");
+    // Listen for Firebase authentication state changes
+    onAuthStateChanged(auth, async (user) => {
+      const authButtonsContainer = document.getElementById("auth-buttons-container");
+      const loggedInStatus = document.getElementById("logged-in-status");
+      const userStatusText = document.getElementById("user-status");
+      const displayUserId = document.getElementById("display-user-id");
+      const currentUserIdContainer = document.getElementById("current-user-id");
 
-      if (user) {
-        // User is signed in
-        userId = user.uid; // Set the global userId
-        authButtonsContainer.classList.add("hidden"); // Hide sign up/login buttons
-        loggedInStatus.classList.remove("hidden"); // Show logout button and user status
-        currentUserIdContainer.classList.remove("hidden"); // Show user ID container
-        userStatusText.textContent = `Logged in as: ${user.email}`;
-        displayUserId.textContent = userId; // Display the full user ID
+      if (user) {
+        // User is signed in
+        userId = user.uid; // Set the global userId
+        authButtonsContainer.classList.add("hidden"); // Hide sign up/login buttons
+        loggedInStatus.classList.remove("hidden"); // Show logout button and user status
+        currentUserIdContainer.classList.remove("hidden"); // Show user ID container
+        userStatusText.textContent = `Logged in as: ${user.email}`;
+        displayUserId.textContent = userId; // Display the full user ID
 
-        // Attempt to sign in with custom token if available (for Canvas environment)
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
-            await signInWithCustomToken(auth, __initial_auth_token);
-            console.log("Signed in with custom token.");
-          } catch (error) {
-            console.error("Error signing in with custom token:", error);
-            // Fallback to anonymous sign-in if custom token fails
-            try {
-              await signInAnonymously(auth);
-              console.log("Signed in anonymously.");
-              userId = auth.currentUser?.uid || crypto.randomUUID();
-              displayUserId.textContent = userId;
-            } catch (anonError) {
-              console.error("Error signing in anonymously:", anonError);
-            }
-          }
-        } else if (!auth.currentUser) {
-          // If no user and no custom token, sign in anonymously
-          try {
-            await signInAnonymously(auth);
-            console.log("Signed in anonymously.");
-            userId = auth.currentUser?.uid || crypto.randomUUID(); // Set userId for anonymous
-            displayUserId.textContent = userId;
-          } catch (anonError) {
-            console.error("Error signing in anonymously:", anonError);
-          }
-        }
+        // Attempt to sign in with custom token if available (for Canvas environment)
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          try {
+            await signInWithCustomToken(auth, __initial_auth_token);
+            console.log("Signed in with custom token.");
+          } catch (error) {
+            console.error("Error signing in with custom token:", error);
+            // Fallback to anonymous sign-in if custom token fails
+            try {
+              await signInAnonymously(auth);
+              console.log("Signed in anonymously.");
+              userId = auth.currentUser?.uid || crypto.randomUUID();
+              displayUserId.textContent = userId;
+            } catch (anonError) {
+              console.error("Error signing in anonymously:", anonError);
+            }
+          }
+        } else if (!auth.currentUser) {
+          // If no user and no custom token, sign in anonymously
+          try {
+            await signInAnonymously(auth);
+            console.log("Signed in anonymously.");
+            userId = auth.currentUser?.uid || crypto.randomUUID(); // Set userId for anonymous
+            displayUserId.textContent = userId;
+          } catch (anonError) {
+            console.error("Error signing in anonymously:", anonError);
+          }
+        }
 
-        // Hide auth and login modals if user is already logged in
-        document.getElementById("authModal").style.display = "none";
-        document.getElementById("loginModal").style.display = "none";
+        // Hide auth and login modals if user is already logged in
+        document.getElementById("authModal").style.display = "none";
+        document.getElementById("loginModal").style.display = "none";
 
-      } else {
-        // User is signed out
-        userId = null; // Clear the global userId
-        authButtonsContainer.classList.remove("hidden"); // Show sign up/login buttons
-        loggedInStatus.classList.add("hidden"); // Hide logout button and user status
-        currentUserIdContainer.classList.add("hidden"); // Hide user ID container
-        userStatusText.textContent = ""; // Clear user status
-        displayUserId.textContent = ""; // Clear user ID
-      }
-    });
+      } else {
+        // User is signed out
+        userId = null; // Clear the global userId
+        authButtonsContainer.classList.remove("hidden"); // Show sign up/login buttons
+        loggedInStatus.classList.add("hidden"); // Hide logout button and user status
+        currentUserIdContainer.classList.add("hidden"); // Hide user ID container
+        userStatusText.textContent = ""; // Clear user status
+        displayUserId.textContent = ""; // Clear user ID
+      }
+    });
 
-    // Event listeners are set up after the DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", () => {
-      // Navigation links (using .nav-link class)
-      document.querySelectorAll(".nav-link").forEach(link => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault(); // Prevent default anchor behavior
-          const sectionId = event.target.dataset.section;
-          if (sectionId) {
-            showSection(sectionId);
-          }
-        });
-      });
+    // Event listeners are set up after the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      // Navigation links (using .nav-link class)
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault(); // Prevent default anchor behavior
+          const sectionId = event.target.dataset.section;
+          if (sectionId) {
+            showSection(sectionId);
+          }
+        });
+      });
 
-      // Section-specific links (using .section-link class)
-      document.querySelectorAll(".section-link").forEach(link => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault(); // Prevent default anchor behavior
-          const sectionId = event.target.dataset.section;
-          if (sectionId) {
-            showSection(sectionId);
-          }
-        });
-      });
+      // Section-specific links (using .section-link class)
+      document.querySelectorAll(".section-link").forEach(link => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault(); // Prevent default anchor behavior
+          const sectionId = event.target.dataset.section;
+          if (sectionId) {
+            showSection(sectionId);
+          }
+        });
+      });
 
-      // Authentication modal buttons
-      document.getElementById("signup-modal-btn").addEventListener("click", () => {
-        document.getElementById("authModal").style.display = "flex";
-      });
-      document.getElementById("login-modal-btn").addEventListener("click", () => {
-        document.getElementById("loginModal").style.display = "flex";
-      });
+      // Authentication modal buttons
+      document.getElementById("signup-modal-btn").addEventListener("click", () => {
+        document.getElementById("authModal").style.display = "flex";
+      });
+      document.getElementById("login-modal-btn").addEventListener("click", () => {
+        document.getElementById("loginModal").style.display = "flex";
+      });
 
-      // Auth actions
-      document.getElementById("signup-button").addEventListener("click", handleSignUp);
-      document.getElementById("login-button").addEventListener("click", handleLogin);
-      document.getElementById("logout-button").addEventListener("click", handleLogout);
+      // Auth actions
+      document.getElementById("signup-button").addEventListener("click", handleSignUp);
+      document.getElementById("login-button").addEventListener("click", handleLogin);
+      document.getElementById("logout-button").addEventListener("click", handleLogout);
 
-      // Modal close buttons
-      document.getElementById("signup-cancel-btn").addEventListener("click", () => {
-        document.getElementById("authModal").style.display = "none";
-      });
-      document.getElementById("login-cancel-btn").addEventListener("click", () => {
-        document.getElementById("loginModal").style.display = "none";
-      });
-      document.getElementById("message-ok-btn").addEventListener("click", () => {
-        document.getElementById("messageModal").style.display = "none";
-      });
+      // Modal close buttons
+      document.getElementById("signup-cancel-btn").addEventListener("click", () => {
+        document.getElementById("authModal").style.display = "none";
+      });
+      document.getElementById("login-cancel-btn").addEventListener("click", () => {
+        document.getElementById("loginModal").style.display = "none";
+      });
+      document.getElementById("message-ok-btn").addEventListener("click", () => {
+        document.getElementById("messageModal").style.display = "none";
+      });
 
-      // Premium plan subscription buttons
-      document.getElementById("basicSubscribeBtn").addEventListener("click", () => redirectToCheckout("basic"));
-      document.getElementById("vipSubscribeBtn").addEventListener("click", () => redirectToCheckout("vip"));
+      // Premium plan subscription buttons
+      document.getElementById("basicSubscribeBtn").addEventListener("click", () => redirectToCheckout("basic"));
+      document.getElementById("vipSubscribeBtn").addEventListener("click", () => redirectToCheckout("vip"));
+      document.getElementById("kidsSubscribeBtn").addEventListener("click", () => redirectToCheckout("kids")); // New Kids Plan button
 
-      // Explore All Plans button
-      document.getElementById("explore-plans-btn").addEventListener("click", () => showSection("premium-plans-section"));
+      // Explore All Plans button
+      document.getElementById("explore-plans-btn").addEventListener("click", () => showSection("premium-plans-section"));
 
-      // Ensure initial section is shown on page load
-      showSection('home-section');
-    });
-  </script>
+      // Ensure initial section is shown on page load
+      showSection('home-section');
+    });
+  </script>
 </body>
 </html>
