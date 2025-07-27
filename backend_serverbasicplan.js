@@ -2,7 +2,6 @@
 
 const express = require('express');
 const cors = require('cors'); // Import the CORS middleware
-const stripe = require('stripe')('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'); // IMPORTANT: Replace with your actual sk_test_ or sk_live_ key
 
 const app = express();
 
@@ -59,8 +58,7 @@ app.post('/', async (req, res) => {
 // (Optional) Stripe Webhook Endpoint
 // This endpoint receives notifications from Stripe about payment events.
 app.post('/webhooks/stripe', express.raw({type: 'application/json'}), (request, response) => {
-  // Updated with the provided Stripe Webhook Secret
-  const endpointSecret = 'whsec_cSMxzKisOufbbLKtAewYE0CCg8pkqZ1b'; 
+ 
   const sig = request.headers['stripe-signature'];
 
   let event;
