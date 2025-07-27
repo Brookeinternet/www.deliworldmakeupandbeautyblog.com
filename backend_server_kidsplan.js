@@ -57,8 +57,7 @@ exports.createKidsPlanCheckoutSession = functions.https.onCall(async (data, cont
 
 // (Optional) Stripe Webhook Endpoint for Kids Plan
 app.post('/webhooks/stripe', express.raw({type: 'application/json'}), (request, response) => {
-  // IMPORTANT: Replaced with your actual Stripe Webhook Secret for this specific Kids Plan webhook
-  const endpointSecret = 'whsec_NdcBQSV3VAipP8csc2mhx9CpKBFsyt4O';
+  
   const sig = request.headers['stripe-signature'];
   let event;
   try {
