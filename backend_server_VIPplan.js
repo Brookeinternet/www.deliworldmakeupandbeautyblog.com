@@ -2,6 +2,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const stripe = require('stripe')('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'); // Replaced with your Stripe secret key
 
 const app = express();
 app.use(cors()); // Enable CORS for your frontend
@@ -37,7 +38,8 @@ app.post('/', async (req, res) => {
 
 // (Optional) Stripe Webhook Endpoint for VIP Plan
 app.post('/webhooks/stripe', express.raw({type: 'application/json'}), (request, response) => {
-
+  // IMPORTANT: Replaced with your actual Stripe Webhook Secret for this specific VIP webhook
+  const endpointSecret = 'whsec_gB02pzHE0L1erLRDOs6g5XIUg3tTqoTT';
   const sig = request.headers['stripe-signature'];
   let event;
   try {
